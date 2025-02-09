@@ -1,0 +1,17 @@
+{
+  "settings": {
+    "title": "Settings",
+    "toneOfVoice": "Tone of voice",
+    "apiKeys": "API Keys",
+    "apiChatGPT": "API ChatGPT",
+    "apiClaude": "API Claude",
+    "defaultModel": "Default Model",
+    "morningText": "Morning Text",
+    "eveningText": "Evening Text",
+    "header": "Header",
+    "before": "Before",
+    "blockHeader": "Block Header",
+    "after": "After",
+    "submit": "Submit"
+  }
+}
