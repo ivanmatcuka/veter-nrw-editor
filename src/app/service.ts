@@ -1,4 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import Anthropic from "@anthropic-ai/sdk";
+import { ChatGPTAPI, ChatGPTError, ChatMessage } from "chatgpt";
+
+const API_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL;
 
 type ToneResponse = {
   data: {
@@ -11,7 +14,7 @@ type ToneResponse = {
   weekLater: string;
 };
 
-type SettingsResponse = {
+export type SettingsResponse = {
   id: number;
   default_model: string;
   api_chat_gpt: string;
@@ -26,6 +29,9 @@ type SettingsResponse = {
   evening_text_after: string;
   created_at: string;
   updated_at: string;
+  news_prompt: string;
+  news_header_prompt: string;
+  weather_morning_prompt: string;
 };
 
 type UpdateSettingsRequest = Omit<
@@ -54,12 +60,15 @@ export const getTones = async (): Promise<ToneResponse["data"]> => {
 
 export const getSettings = async (): Promise<SettingsResponse | null> => {
   try {
-    const response = await fetch(`${API_URL}/settings`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `${API_URL}/wp-json/veter-nrw-plugin/v1/settings`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to get tones");
@@ -86,5 +95,50 @@ export const updateSettings = async (data: UpdateSettingsRequest) => {
     }
   } catch {
     return null;
+  }
+};
+
+export const getChatGPTResponse = async (
+  apiKey: string,
+  prompt: string,
+  onProgress?: ((partialResponse: ChatMessage) => void) | undefined
+) => {
+  try {
+    const api = new ChatGPTAPI({
+      apiKey,
+    });
+
+    const res = await api.sendMessage(prompt, {
+      onProgress,
+    });
+
+    return { data: res.text, error: null };
+  } catch (error) {
+    const errorResponse = error as ChatGPTError;
+    console.error(errorResponse);
+    return { data: null, error: errorResponse.message };
+  }
+};
+
+export const getClaudeResponse = async (apiKey: string, prompt: string) => {
+  try {
+    const api = new Anthropic({
+      dangerouslyAllowBrowser: true,
+      apiKey,
+    });
+
+    const res = await api.messages.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "claude-3-5-sonnet-latest",
+      max_tokens: 1024,
+    });
+
+    return { data: res.content, error: null };
+  } catch (error) {
+    const { error: errorResponse } = error as {
+      error: Anthropic.ErrorResponse;
+    };
+    console.error(errorResponse);
+    return { data: null, error: errorResponse.error.message };
   }
 };

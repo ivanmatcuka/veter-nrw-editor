@@ -46,7 +46,7 @@ export default function BasicTabs() {
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%" }} maxWidth="md" mx="auto">
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
           value={value}
@@ -60,7 +60,7 @@ export default function BasicTabs() {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        <Settings />
+        <NewsForm />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         <MorningForm />
@@ -69,7 +69,7 @@ export default function BasicTabs() {
         <EveningForm />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={3}>
-        <NewsForm />
+        <Settings />
       </CustomTabPanel>
     </Box>
   );

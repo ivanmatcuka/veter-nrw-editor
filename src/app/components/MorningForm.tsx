@@ -7,8 +7,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { useMemo } from "react";
 import { AI_MODELS, useSettings } from "../SettingsContext";
+import { GeneratedResponse } from "./GeneratedResponse";
 
 type News = Partial<{
   text: string;
@@ -22,8 +22,8 @@ export const MorningForm = () => {
   const formik = useFormik({
     initialValues: {
       ...settings,
-      weatherText: "",
-      selectedModel: "",
+      weatherText: settings?.weather_morning_prompt,
+      selectedModel: settings?.default_model,
       generatedText: "",
       news: [{}, {}] as News,
     },
@@ -60,27 +60,19 @@ export const MorningForm = () => {
     formik.setFieldValue("news", newNews);
   };
 
-  const prompt = useMemo(
-    () =>
-      formik.values.news
-        .map(
-          (
-            item
-          ) => `You are news writer. Write news article in Russian based on text below. Write only article, no additional text. Article should be 1 paragraph lengh. Add a link ${
-            item.url
-          } to the first verb (not an adverb or other word) of this text. ${
-            item.extra || ""
-          }
-
-Text: ${item.text || ""}`
-        )
-        .join("\n\n"),
-    [formik.values.news]
-  );
-
   return (
-    <Box maxWidth="md" width="100%" margin="auto" p={3}>
-      <form onSubmit={formik.handleSubmit}>
+    <Box
+      maxWidth="md"
+      width="100%"
+      margin="auto"
+      p={3}
+      onSubmit={formik.handleSubmit}
+      component="form"
+      display="flex"
+      flexDirection="column"
+      gap={4}
+    >
+      <Box>
         <Typography variant="h5" gutterBottom>
           Погода
         </Typography>
@@ -94,130 +86,159 @@ Text: ${item.text || ""}`
           onChange={formik.handleChange}
           sx={{ mb: 2 }}
         />
+      </Box>
 
-        <Box>
-          <Typography variant="h5" gutterBottom>
-            Новости
-          </Typography>
-          {formik.values.news.map((item, index) => (
-            <Box key={index} sx={{ mb: 2 }}>
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                label={`Новость ${index + 1}`}
-                value={item.text}
-                onChange={(e) =>
-                  handleUpdateNewsItem(index, "text", e.target.value)
-                }
-                sx={{ mb: 1 }}
-              />
-              <TextField
-                fullWidth
-                label="URL"
-                value={item.url}
-                onChange={(e) =>
-                  handleUpdateNewsItem(index, "url", e.target.value)
-                }
-                sx={{ mb: 1 }}
-              />
-              <TextField
-                fullWidth
-                label="Дополнительные инструкции"
-                value={item.extra}
-                onChange={(e) =>
-                  handleUpdateNewsItem(index, "extra", e.target.value)
-                }
-                sx={{ mb: 1 }}
-              />
-              <Button onClick={() => handleRemoveNewsItem(index)}>
-                Удалить новость
-              </Button>
-            </Box>
-          ))}
-          <Button onClick={handleAddNewsItem}>Добавить новость</Button>
-        </Box>
-
-        <Box>
-          <Typography variant="h5" gutterBottom>
-            Выберите модель
-          </Typography>
-          {AI_MODELS.map((model) => (
-            <FormControlLabel
-              key={model}
-              control={
-                <Radio
-                  checked={formik.values.selectedModel === model}
-                  onChange={() => formik.setFieldValue("selectedModel", model)}
-                />
-              }
-              label={model}
-            />
-          ))}
-        </Box>
-
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            Текст для утра
-          </Typography>
-          <TextField
-            fullWidth
-            label="Заголовок"
-            name="morningText.header"
-            value={formik.values.morningText.header}
-            onChange={formik.handleChange}
+      <Box display="flex" flexDirection="column">
+        <Typography variant="h5" gutterBottom>
+          Новости
+        </Typography>
+        {formik.values.news.map((item, index) => (
+          <Box
+            key={index}
             sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Перед блоком"
-            name="morningText.before"
-            value={formik.values.morningText.before}
-            onChange={formik.handleChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Заголовок блока"
-            name="morningText.blockHeader"
-            value={formik.values.morningText.blockHeader}
-            onChange={formik.handleChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="После блока"
-            name="morningText.after"
-            value={formik.values.morningText.after}
-            onChange={formik.handleChange}
-            sx={{ mb: 2 }}
-          />
-        </Box>
-
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-        >
-          Сгенерировать
-        </Button>
-
-        {formik.values.generatedText && (
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Сгенерированный текст:
-            </Typography>
+            display="flex"
+            flexDirection="column"
+            gap={1}
+          >
             <TextField
               fullWidth
               multiline
-              rows={6}
-              value={formik.values.generatedText}
-              InputProps={{ readOnly: true }}
+              rows={4}
+              label={`Новость ${index + 1}`}
+              value={item.text}
+              onChange={(e) =>
+                handleUpdateNewsItem(index, "text", e.target.value)
+              }
+              sx={{ mb: 1 }}
             />
+            <TextField
+              fullWidth
+              label="URL"
+              value={item.url}
+              onChange={(e) =>
+                handleUpdateNewsItem(index, "url", e.target.value)
+              }
+              sx={{ mb: 1 }}
+            />
+            <TextField
+              fullWidth
+              label="Дополнительные инструкции"
+              value={item.extra}
+              onChange={(e) =>
+                handleUpdateNewsItem(index, "extra", e.target.value)
+              }
+              sx={{ mb: 1 }}
+            />
+            <Button
+              onClick={() => handleRemoveNewsItem(index)}
+              variant="outlined"
+              color="error"
+            >
+              Удалить новость
+            </Button>
           </Box>
+        ))}
+        <Button onClick={handleAddNewsItem} variant="outlined">
+          Добавить новость
+        </Button>
+      </Box>
+
+      <Box>
+        <Typography variant="h5" gutterBottom>
+          Текст для утра
+        </Typography>
+        <TextField
+          fullWidth
+          label="Заголовок"
+          name="morning_text_header"
+          value={formik.values.morning_text_header}
+          onChange={formik.handleChange}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Перед блоком"
+          name="morning_text_before"
+          value={formik.values.morning_text_before}
+          onChange={formik.handleChange}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Заголовок блока"
+          name="morning_text_block_header"
+          value={formik.values.morning_text_block_header}
+          onChange={formik.handleChange}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="После блока"
+          name="morning_text_after"
+          value={formik.values.morning_text_after}
+          onChange={formik.handleChange}
+          sx={{ mb: 2 }}
+        />
+      </Box>
+      <Box>
+        <Typography variant="h5" gutterBottom>
+          Используемая модель
+        </Typography>
+        {AI_MODELS.map((model) => (
+          <FormControlLabel
+            key={model}
+            control={
+              <Radio
+                checked={formik.values.selectedModel === model}
+                onChange={() => formik.setFieldValue("selectedModel", model)}
+              />
+            }
+            label={model}
+          />
+        ))}
+      </Box>
+
+      <Box display="flex" flexDirection="column" gap={2}>
+        {!formik.values.generatedText ? (
+          <Button
+            variant="contained"
+            onClick={() => formik.setFieldValue("generatedText", true)}
+            sx={{ mb: 2 }}
+          >
+            Сгенерировать
+          </Button>
+        ) : (
+          formik.values.selectedModel && (
+            <>
+              <Typography variant="h5" gutterBottom>
+                {formik.values.morning_text_header}
+              </Typography>
+              <Typography variant="h6" gutterBottom>
+                {formik.values.morning_text_before}
+              </Typography>
+              <GeneratedResponse
+                model={formik.values.selectedModel ?? ""}
+                prompt={formik.values.weather_morning_prompt ?? ""}
+                apiKey={settings.api_chat_gpt ?? ""}
+              />
+              <Typography variant="h6" gutterBottom>
+                {formik.values.morning_text_block_header}
+              </Typography>
+              {formik.values.news.map((item, index) => (
+                <GeneratedResponse
+                  key={index}
+                  model={formik.values.selectedModel ?? ""}
+                  prompt={item.text ?? ""}
+                  apiKey={settings.api_chat_gpt ?? ""}
+                />
+              ))}
+              <Typography variant="h6">
+                {formik.values.morning_text_after}
+              </Typography>
+            </>
+          )
         )}
-      </form>
+      </Box>
     </Box>
   );
 };

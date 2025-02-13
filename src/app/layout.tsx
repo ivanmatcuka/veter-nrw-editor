@@ -1,22 +1,23 @@
-import theme from "@/theme";
+import theme from "@/src/theme";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
-import { EB_Garamond, Geist_Mono } from "next/font/google";
+import { Ubuntu } from "next/font/google";
 import "./globals.css";
 import { SettingsProvider } from "./SettingsContext";
 
-const ebGaramond = EB_Garamond({
-  variable: "--font-eb-garamond",
+const ebGaramond = Ubuntu({
+  variable: "--font-ubuntu",
   subsets: ["latin"],
   weight: ["400", "500", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const geistMono = Ubuntu({
+  variable: "--font-ubuntu",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {

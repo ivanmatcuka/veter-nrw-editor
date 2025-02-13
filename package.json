@@ -3,22 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.3",
+    "@apollo/client": "^3.8.0",
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.4",
     "@mui/material": "^6.4.2",
     "@mui/material-nextjs": "^6.4.3",
+    "chatgpt": "^5.2.5",
     "formik": "^2.4.6",
+    "graphql": "^16.7.1",
     "next": "15.1.6",
     "next-intl": "^3.26.3",
+    "next-secure-headers": "^2.2.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "stringinject": "^2.1.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
