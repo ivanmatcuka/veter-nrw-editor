@@ -1,14 +1,14 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { ChatGPTAPI, ChatGPTError, ChatMessage } from "chatgpt";
+import Anthropic from '@anthropic-ai/sdk';
+import { ChatGPTAPI, ChatGPTError, ChatMessage } from 'chatgpt';
 
 const API_URL = process.env.NEXT_PUBLIC_WORDPRESS_URL;
 
 type ToneResponse = {
   data: {
-    id: "string";
-    name: "string";
-    photo: "string";
-    date_of_birth: "string";
+    id: 'string';
+    name: 'string';
+    photo: 'string';
+    date_of_birth: 'string';
   }[];
   targetDate: string;
   weekLater: string;
@@ -36,20 +36,20 @@ export type SettingsResponse = {
 
 type UpdateSettingsRequest = Omit<
   SettingsResponse,
-  "id" | "created_at" | "updated_at"
+  'id' | 'created_at' | 'updated_at'
 >;
 
-export const getTones = async (): Promise<ToneResponse["data"]> => {
+export const getTones = async (): Promise<ToneResponse['data']> => {
   try {
     const response = await fetch(`${API_URL}/tones`, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
 
     if (!response.ok) {
-      throw new Error("Failed to get tones");
+      throw new Error('Failed to get tones');
     }
 
     return await response.json();
@@ -63,15 +63,15 @@ export const getSettings = async (): Promise<SettingsResponse | null> => {
     const response = await fetch(
       `${API_URL}/wp-json/veter-nrw-plugin/v1/settings`,
       {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     if (!response.ok) {
-      throw new Error("Failed to get tones");
+      throw new Error('Failed to get tones');
     }
 
     return await response.json();
@@ -83,15 +83,15 @@ export const getSettings = async (): Promise<SettingsResponse | null> => {
 export const updateSettings = async (data: UpdateSettingsRequest) => {
   try {
     const response = await fetch(`${API_URL}/settings`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
-      throw new Error("Failed to update settings");
+      throw new Error('Failed to update settings');
     }
   } catch {
     return null;
@@ -101,7 +101,7 @@ export const updateSettings = async (data: UpdateSettingsRequest) => {
 export const getChatGPTResponse = async (
   apiKey: string,
   prompt: string,
-  onProgress?: ((partialResponse: ChatMessage) => void) | undefined
+  onProgress?: ((partialResponse: ChatMessage) => void) | undefined,
 ) => {
   try {
     const api = new ChatGPTAPI({
@@ -128,8 +128,8 @@ export const getClaudeResponse = async (apiKey: string, prompt: string) => {
     });
 
     const res = await api.messages.create({
-      messages: [{ role: "user", content: prompt }],
-      model: "claude-3-5-sonnet-latest",
+      messages: [{ role: 'user', content: prompt }],
+      model: 'claude-3-5-sonnet-latest',
       max_tokens: 1024,
     });
 

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   createContext,
@@ -7,17 +7,18 @@ import {
   useContext,
   useEffect,
   useState,
-} from "react";
-import { getSettings, SettingsResponse } from "./service";
+} from 'react';
+
+import { getSettings, SettingsResponse } from './service';
 type SettingsContextType = {
   settings: Partial<SettingsResponse>;
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(
-  undefined
+  undefined,
 );
 
-export const AI_MODELS = ["ChatGPT", "Claude"];
+export const AI_MODELS = ['ChatGPT', 'Claude'];
 
 export const SettingsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [settings, setSettings] = useState<Partial<SettingsResponse>>({});
@@ -45,7 +46,7 @@ export const useSettings = () => {
   const context = useContext(SettingsContext);
 
   if (context === undefined) {
-    throw new Error("useSettings must be used within a SettingsProvider");
+    throw new Error('useSettings must be used within a SettingsProvider');
   }
 
   return context;

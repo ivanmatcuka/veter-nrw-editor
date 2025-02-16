@@ -1,3 +1,4 @@
+import { Page } from '@/src/components/Page';
 import {
   Box,
   Button,
@@ -5,10 +6,10 @@ import {
   Radio,
   TextField,
   Typography,
-} from "@mui/material";
-import { useFormik } from "formik";
-import { AI_MODELS, useSettings } from "../SettingsContext";
-import { GeneratedResponse } from "./GeneratedResponse";
+} from '@mui/material';
+import { useFormik } from 'formik';
+import { AI_MODELS, useSettings } from '../SettingsContext';
+import { GeneratedResponse } from './GeneratedResponse';
 
 type News = Partial<{
   text: string;
@@ -24,54 +25,44 @@ export const MorningForm = () => {
       ...settings,
       weatherText: settings?.weather_morning_prompt,
       selectedModel: settings?.default_model,
-      generatedText: "",
+      generatedText: '',
       news: [{}, {}] as News,
     },
     onSubmit: async (values) => {
       // Here you would typically handle form submission
-      console.log("Form submitted with values:", values);
+      console.log('Form submitted with values:', values);
       // Simulating text generation
       formik.setFieldValue(
-        "generatedText",
-        "Generated text would appear here..."
+        'generatedText',
+        'Generated text would appear here...',
       );
     },
   });
 
   const handleAddNewsItem = () => {
-    formik.setFieldValue("news", [
+    formik.setFieldValue('news', [
       ...formik.values.news,
-      { text: "", url: "", extra: "" },
+      { text: '', url: '', extra: '' },
     ]);
   };
 
   const handleRemoveNewsItem = (index: number) => {
     const newNews = formik.values.news.filter((_, i) => i !== index);
-    formik.setFieldValue("news", newNews);
+    formik.setFieldValue('news', newNews);
   };
 
   const handleUpdateNewsItem = (
     index: number,
     field: keyof News[0],
-    value: string
+    value: string,
   ) => {
     const newNews = [...formik.values.news];
     newNews[index] = { ...newNews[index], [field]: value };
-    formik.setFieldValue("news", newNews);
+    formik.setFieldValue('news', newNews);
   };
 
   return (
-    <Box
-      maxWidth="md"
-      width="100%"
-      margin="auto"
-      p={3}
-      onSubmit={formik.handleSubmit}
-      component="form"
-      display="flex"
-      flexDirection="column"
-      gap={4}
-    >
+    <Page>
       <Box>
         <Typography variant="h5" gutterBottom>
           Погода
@@ -107,7 +98,7 @@ export const MorningForm = () => {
               label={`Новость ${index + 1}`}
               value={item.text}
               onChange={(e) =>
-                handleUpdateNewsItem(index, "text", e.target.value)
+                handleUpdateNewsItem(index, 'text', e.target.value)
               }
               sx={{ mb: 1 }}
             />
@@ -116,7 +107,7 @@ export const MorningForm = () => {
               label="URL"
               value={item.url}
               onChange={(e) =>
-                handleUpdateNewsItem(index, "url", e.target.value)
+                handleUpdateNewsItem(index, 'url', e.target.value)
               }
               sx={{ mb: 1 }}
             />
@@ -125,7 +116,7 @@ export const MorningForm = () => {
               label="Дополнительные инструкции"
               value={item.extra}
               onChange={(e) =>
-                handleUpdateNewsItem(index, "extra", e.target.value)
+                handleUpdateNewsItem(index, 'extra', e.target.value)
               }
               sx={{ mb: 1 }}
             />
@@ -190,7 +181,7 @@ export const MorningForm = () => {
             control={
               <Radio
                 checked={formik.values.selectedModel === model}
-                onChange={() => formik.setFieldValue("selectedModel", model)}
+                onChange={() => formik.setFieldValue('selectedModel', model)}
               />
             }
             label={model}
@@ -202,7 +193,7 @@ export const MorningForm = () => {
         {!formik.values.generatedText ? (
           <Button
             variant="contained"
-            onClick={() => formik.setFieldValue("generatedText", true)}
+            onClick={() => formik.setFieldValue('generatedText', true)}
             sx={{ mb: 2 }}
           >
             Сгенерировать
@@ -217,9 +208,9 @@ export const MorningForm = () => {
                 {formik.values.morning_text_before}
               </Typography>
               <GeneratedResponse
-                model={formik.values.selectedModel ?? ""}
-                prompt={formik.values.weather_morning_prompt ?? ""}
-                apiKey={settings.api_chat_gpt ?? ""}
+                model={formik.values.selectedModel ?? ''}
+                prompt={formik.values.weather_morning_prompt ?? ''}
+                apiKey={settings.api_chat_gpt ?? ''}
               />
               <Typography variant="h6" gutterBottom>
                 {formik.values.morning_text_block_header}
@@ -227,9 +218,9 @@ export const MorningForm = () => {
               {formik.values.news.map((item, index) => (
                 <GeneratedResponse
                   key={index}
-                  model={formik.values.selectedModel ?? ""}
-                  prompt={item.text ?? ""}
-                  apiKey={settings.api_chat_gpt ?? ""}
+                  model={formik.values.selectedModel ?? ''}
+                  prompt={item.text ?? ''}
+                  apiKey={settings.api_chat_gpt ?? ''}
                 />
               ))}
               <Typography variant="h6">
@@ -239,6 +230,6 @@ export const MorningForm = () => {
           )
         )}
       </Box>
-    </Box>
+    </Page>
   );
 };

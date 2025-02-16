@@ -1,144 +1,127 @@
-"use client";
+'use client';
 
-import { Page } from "@/src/components/Page";
-import { Box, MenuItem, Select, TextField, Typography } from "@mui/material";
-import { useTranslations } from "next-intl";
-import { AI_MODELS, useSettings } from "../SettingsContext";
-import { Tones } from "./Tones";
+import { Box, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { useTranslations } from 'next-intl';
+import { FC } from 'react';
+
+import { Page } from '@/src/components/Page';
+
+import { AI_MODELS, useSettings } from '../SettingsContext';
+import { Tones } from './Tones';
+
+type SettingsFieldProps = { name: string; label: string; value?: string };
+const SettingsField: FC<SettingsFieldProps> = ({ name, label, value = '' }) => (
+  <TextField
+    fullWidth
+    label={label}
+    name={name}
+    value={value}
+    slotProps={{ inputLabel: { shrink: true } }}
+    disabled
+  />
+);
 
 export const Settings = () => {
   const { settings } = useSettings();
-  const t = useTranslations("settings");
+  const t = useTranslations('settings');
 
   return (
     <Page>
       <Typography variant="h6" gutterBottom>
-        {t("toneOfVoice")}
+        {t('toneOfVoice')}
       </Typography>
 
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
         <Tones tones={[]} />
       </Box>
 
-      <form>
+      <Box display="flex" flexDirection="column" gap={2} component="form">
         <Box display="flex" flexDirection="column" gap={2}>
-          <Box display="flex" flexDirection="column" gap={2}>
-            <Typography variant="h6" gutterBottom>
-              {t("apiKeys")}
-            </Typography>
-            <TextField
-              fullWidth
-              label="API ChatGPT"
-              name="apiChatGPT"
-              value={settings.api_chat_gpt}
-              disabled
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-            <TextField
-              fullWidth
-              label="API Claude"
-              name="apiClaude"
-              value={settings.api_claude}
-              disabled
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-          </Box>
-
-          <Box display="flex" flexDirection="column" gap={2}>
-            <Typography variant="h6" gutterBottom>
-              {t("defaultModel")}
-            </Typography>
-            <Select
-              fullWidth
-              name="defaultModel"
-              value={settings.default_model}
-              disabled
-            >
-              {AI_MODELS.map((model) => (
-                <MenuItem key={model} value={model}>
-                  {model}
-                </MenuItem>
-              ))}
-            </Select>
-          </Box>
-
-          <Box display="flex" flexDirection="column" gap={2}>
-            <Typography variant="h6" gutterBottom>
-              {t("morningText")}
-            </Typography>
-            <TextField
-              fullWidth
-              label={t("header")}
-              name="morningText.header"
-              value={settings.morning_text_header}
-              disabled
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-            <TextField
-              fullWidth
-              label={t("before")}
-              name="morningText.before"
-              value={settings.morning_text_before}
-              disabled
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-            <TextField
-              fullWidth
-              label={t("blockHeader")}
-              name="morningText.blockHeader"
-              value={settings.morning_text_block_header}
-              disabled
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-            <TextField
-              fullWidth
-              label={t("after")}
-              name="morningText.after"
-              value={settings.morning_text_after}
-              disabled
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-          </Box>
-
-          <Box display="flex" flexDirection="column" gap={2}>
-            <Typography variant="h6" gutterBottom>
-              {t("eveningText")}
-            </Typography>
-            <TextField
-              fullWidth
-              label={t("header")}
-              name="eveningText.header"
-              value={settings.evening_text_header}
-              disabled
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-            <TextField
-              fullWidth
-              label={t("before")}
-              name="eveningText.before"
-              value={settings.evening_text_before}
-              disabled
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-            <TextField
-              fullWidth
-              label={t("blockHeader")}
-              name="eveningText.blockHeader"
-              value={settings.evening_text_block_header}
-              disabled
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-            <TextField
-              fullWidth
-              label={t("after")}
-              name="eveningText.after"
-              value={settings.evening_text_after}
-              disabled
-              slotProps={{ inputLabel: { shrink: true } }}
-            />
-          </Box>
+          <Typography variant="h6" gutterBottom>
+            {t('apiKeys')}
+          </Typography>
+          <SettingsField
+            label="API ChatGPT"
+            name="api_chat_gpt"
+            value={settings.api_chat_gpt}
+          />
+          <SettingsField
+            label="API Claude"
+            name="api_claude"
+            value={settings.api_claude}
+          />
         </Box>
-      </form>
+
+        <Box display="flex" flexDirection="column" gap={2}>
+          <Typography variant="h6" gutterBottom>
+            {t('defaultModel')}
+          </Typography>
+          <Select
+            fullWidth
+            name="default_model"
+            value={settings.default_model}
+            disabled
+          >
+            {AI_MODELS.map((model) => (
+              <MenuItem key={model} value={model}>
+                {model}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+
+        <Box display="flex" flexDirection="column" gap={2}>
+          <Typography variant="h6" gutterBottom>
+            {t('morningText')}
+          </Typography>
+          <SettingsField
+            label={t('header')}
+            name="morning_text_header"
+            value={settings.morning_text_header}
+          />
+          <SettingsField
+            label={t('before')}
+            name="morning_text_before"
+            value={settings.morning_text_before}
+          />
+          <SettingsField
+            label={t('blockHeader')}
+            name="morning_text_block_header"
+            value={settings.morning_text_block_header}
+          />
+          <SettingsField
+            label={t('after')}
+            name="morning_text_after"
+            value={settings.morning_text_after}
+          />
+        </Box>
+
+        <Box display="flex" flexDirection="column" gap={2}>
+          <Typography variant="h6" gutterBottom>
+            {t('eveningText')}
+          </Typography>
+          <SettingsField
+            label={t('header')}
+            name="evening_text_header"
+            value={settings.evening_text_header}
+          />
+          <SettingsField
+            label={t('before')}
+            name="evening_text_before"
+            value={settings.evening_text_before}
+          />
+          <SettingsField
+            label={t('blockHeader')}
+            name="evening_text_block_header"
+            value={settings.evening_text_block_header}
+          />
+          <SettingsField
+            label={t('after')}
+            name="evening_text_after"
+            value={settings.evening_text_after}
+          />
+        </Box>
+      </Box>
     </Page>
   );
 };

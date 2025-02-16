@@ -7,116 +7,113 @@ import {
   Select,
   TextField,
   Typography,
-} from "@mui/material";
-import { useEffect, useState } from "react";
-import stringInject from "stringinject";
+} from '@mui/material';
+import { useFormik } from 'formik';
+import { useEffect, useState } from 'react';
+import stringInject from 'stringinject';
 
-import { useSettings } from "../SettingsContext";
-import { GeneratedResponse } from "./GeneratedResponse";
+import { Page } from '@/src/components/Page';
+import { useSettings } from '../SettingsContext';
+import { GeneratedResponse } from './GeneratedResponse';
 
-const AI_MODELS = ["ChatGPT", "Claude"];
+const AI_MODELS = ['ChatGPT', 'Claude'];
 const PARAGRAPH_OPTIONS = [1, 2, 3, 4, 5];
 
 export const NewsForm = () => {
   const { settings } = useSettings();
-
-  const [newsText, setNewsText] = useState("");
-  const [newsUrl, setNewsUrl] = useState("");
-  const [selectedModel, setSelectedModel] = useState("");
-  const [selectedTone, setSelectedTone] = useState("");
   const [showGeneratedResponse, setShowGeneratedResponse] = useState(false);
-  const [propmpt, setPropmpt] = useState("");
-  const [paragraphCount, setParagraphCount] = useState(3);
-  const [additionalInstructions, setAdditionalInstructions] = useState("");
+
+  const { values, handleChange, setFieldValue, handleSubmit } = useFormik({
+    initialValues: {
+      newsText: '',
+      newsUrl: '',
+      selectedModel: AI_MODELS[0],
+      selectedTone: '',
+      propmpt: '',
+      paragraphCount: 3,
+      additionalInstructions: '',
+    },
+    onSubmit: () => setShowGeneratedResponse(true),
+  });
 
   useEffect(() => {
-    if (settings?.default_model) setSelectedModel(settings.default_model);
-    if (settings?.news_prompt) setPropmpt(settings.news_prompt);
-  }, [settings?.default_model, settings?.news_prompt]);
+    if (settings?.news_prompt) setFieldValue('propmpt', settings.news_prompt);
+  }, [settings?.news_prompt, setFieldValue]);
 
   return (
-    <Box
-      maxWidth="md"
-      width="100%"
-      margin="auto"
-      p={3}
-      display="flex"
-      flexDirection="column"
-      gap={2}
-    >
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          Поле для вставки текста статьи
-        </Typography>
+    <form onSubmit={handleSubmit}>
+      <Page>
+        <Box>
+          <Typography variant="h5" gutterBottom>
+            Поле для вставки текста статьи
+          </Typography>
 
-        <TextField
-          fullWidth
-          multiline
-          rows={4}
-          label="Текст статьи..."
-          value={newsText}
-          onChange={(e) => setNewsText(e.target.value)}
-          sx={{ mb: 2 }}
-        />
-      </Box>
-
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          Поле для вставки URL статьи
-        </Typography>
-        <TextField
-          fullWidth
-          label="News URL"
-          value={newsUrl}
-          onChange={(e) => setNewsUrl(e.target.value)}
-          sx={{ mb: 2 }}
-        />
-      </Box>
-
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          Используемая модель
-        </Typography>
-        <Box display="flex" gap={2} mb={2}>
-          {AI_MODELS.map((model) => (
-            <FormControlLabel
-              key={model}
-              defaultValue={settings.default_model}
-              control={
-                <Radio
-                  checked={selectedModel === model}
-                  onChange={() => setSelectedModel(model)}
-                />
-              }
-              label={model}
-            />
-          ))}
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            onChange={handleChange}
+            label="Текст статьи..."
+            name="newsText"
+            value={values.newsText}
+          />
         </Box>
-      </Box>
 
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          Количество абзацев
-        </Typography>
-        <Select
-          value={paragraphCount}
-          onChange={(e) => setParagraphCount(Number(e.target.value))}
-          sx={{ mb: 2 }}
-        >
-          {PARAGRAPH_OPTIONS.map((count) => (
-            <MenuItem key={count} value={count}>
-              {count}
-            </MenuItem>
-          ))}
-        </Select>
-      </Box>
+        <Box>
+          <Typography variant="h5" gutterBottom>
+            Поле для вставки URL статьи
+          </Typography>
+          <TextField
+            fullWidth
+            label="News URL"
+            value={values.newsUrl}
+            name="newsUrl"
+            onChange={handleChange}
+          />
+        </Box>
 
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          Тон
-        </Typography>
-        <Box display="flex" gap={2} mb={2} flexWrap="wrap">
-          {/* {settings.tones?.map((tone) => (
+        <Box>
+          <Typography variant="h5" gutterBottom>
+            Используемая модель
+          </Typography>
+          <Box display="flex" gap={2} mb={2}>
+            {AI_MODELS.map((model) => (
+              <FormControlLabel
+                key={model}
+                defaultValue={settings.default_model}
+                value={model}
+                name="selectedModel"
+                onChange={handleChange}
+                control={<Radio checked={values.selectedModel === model} />}
+                label={model}
+              />
+            ))}
+          </Box>
+        </Box>
+
+        <Box>
+          <Typography variant="h5" gutterBottom>
+            Количество абзацев
+          </Typography>
+          <Select
+            value={values.paragraphCount}
+            name="paragraphCount"
+            onChange={handleChange}
+          >
+            {PARAGRAPH_OPTIONS.map((count) => (
+              <MenuItem key={count} value={count}>
+                {count}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+
+        <Box>
+          <Typography variant="h5" gutterBottom>
+            Тон
+          </Typography>
+          <Box display="flex" gap={2} mb={2} flexWrap="wrap">
+            {/* {settings.tones?.map((tone) => (
           <FormControlLabel
             key={tone.id}
             control={
@@ -128,76 +125,56 @@ export const NewsForm = () => {
             label={tone.title}
           />
         ))} */}
+          </Box>
         </Box>
-      </Box>
 
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          Дополнение к запросу
-        </Typography>
-        <Box display="flex" gap={2} mb={2} flexWrap="wrap">
-          <TextField
-            fullWidth
-            multiline
-            rows={2}
-            label="Дополнение к запросу..."
-            value={additionalInstructions}
-            onChange={(e) => setAdditionalInstructions(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-        </Box>
-      </Box>
-
-      {propmpt && (
         <Box>
           <Typography variant="h5" gutterBottom>
-            Запрос
+            Дополнение к запросу
           </Typography>
           <Box display="flex" gap={2} mb={2} flexWrap="wrap">
             <TextField
               fullWidth
               multiline
-              disabled
-              value={stringInject(propmpt, {
-                count: paragraphCount,
-                tone: selectedTone,
-                add: additionalInstructions,
-                news_text: newsText,
-              })}
-              sx={{ mb: 2 }}
+              rows={2}
+              label="Дополнение к запросу..."
+              name="additionalInstructions"
+              value={values.additionalInstructions}
+              onChange={handleChange}
             />
           </Box>
         </Box>
-      )}
 
-      <Box display="flex" flexDirection="column" gap={2}>
-        {!showGeneratedResponse ? (
-          <Button
-            variant="contained"
-            onClick={() => setShowGeneratedResponse(true)}
-            sx={{ mb: 2 }}
-          >
-            Сгенерировать
-          </Button>
-        ) : (
-          selectedModel &&
-          propmpt &&
-          settings.news_header_prompt && (
-            <>
-              <GeneratedResponse
-                model={selectedModel}
-                prompt={propmpt}
-                apiKey={settings.api_chat_gpt ?? ""}
-              />
-              <GeneratedResponse
-                model={selectedModel}
-                prompt={settings.news_header_prompt}
-                apiKey={settings.api_chat_gpt ?? ""}
-              />
-            </>
-          )
-        )}
-      </Box>
-    </Box>
+        <Box display="flex" flexDirection="column" gap={2}>
+          {!showGeneratedResponse ? (
+            <Button variant="contained" type="submit" sx={{ mb: 2 }}>
+              Сгенерировать
+            </Button>
+          ) : (
+            values.selectedModel &&
+            values.propmpt &&
+            settings.news_header_prompt && (
+              <>
+                <GeneratedResponse
+                  model={values.selectedModel}
+                  prompt={stringInject(values.propmpt, {
+                    count: values.paragraphCount,
+                    tone: values.selectedTone,
+                    add: values.additionalInstructions,
+                    news_text: values.newsText,
+                  })}
+                  apiKey={settings.api_chat_gpt ?? ''}
+                />
+                <GeneratedResponse
+                  model={values.selectedModel}
+                  prompt={settings.news_header_prompt}
+                  apiKey={settings.api_chat_gpt ?? ''}
+                />
+              </>
+            )
+          )}
+        </Box>
+      </Page>
+    </form>
   );
 };
