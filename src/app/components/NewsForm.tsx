@@ -9,19 +9,20 @@ import {
   Typography,
 } from '@mui/material';
 import { useFormik } from 'formik';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import stringInject from 'stringinject';
 
 import { Page } from '@/src/components/Page';
-import { useSettings } from '../SettingsContext';
+import { AI_MODELS, useSettings } from '../SettingsContext';
 import { GeneratedResponse } from './GeneratedResponse';
 
-const AI_MODELS = ['ChatGPT', 'Claude'];
 const PARAGRAPH_OPTIONS = [1, 2, 3, 4, 5];
 
 export const NewsForm = () => {
   const { settings } = useSettings();
   const [showGeneratedResponse, setShowGeneratedResponse] = useState(false);
+  const t = useTranslations('newsForm');
 
   const { values, handleChange, setFieldValue, handleSubmit } = useFormik({
     initialValues: {
@@ -45,7 +46,7 @@ export const NewsForm = () => {
       <Page>
         <Box>
           <Typography variant="h5" gutterBottom>
-            Поле для вставки текста статьи
+            {t('articleText')}
           </Typography>
 
           <TextField
@@ -53,7 +54,7 @@ export const NewsForm = () => {
             multiline
             rows={4}
             onChange={handleChange}
-            label="Текст статьи..."
+            label={t('articleTextPlaceholder')}
             name="newsText"
             value={values.newsText}
           />
@@ -61,11 +62,11 @@ export const NewsForm = () => {
 
         <Box>
           <Typography variant="h5" gutterBottom>
-            Поле для вставки URL статьи
+            {t('articleUrl')}
           </Typography>
           <TextField
             fullWidth
-            label="News URL"
+            label={t('articleUrlPlaceholder')}
             value={values.newsUrl}
             name="newsUrl"
             onChange={handleChange}
@@ -74,7 +75,7 @@ export const NewsForm = () => {
 
         <Box>
           <Typography variant="h5" gutterBottom>
-            Используемая модель
+            {t('model')}
           </Typography>
           <Box display="flex" gap={2} mb={2}>
             {AI_MODELS.map((model) => (
@@ -93,7 +94,7 @@ export const NewsForm = () => {
 
         <Box>
           <Typography variant="h5" gutterBottom>
-            Количество абзацев
+            {t('paragraphCount')}
           </Typography>
           <Select
             value={values.paragraphCount}
@@ -110,7 +111,7 @@ export const NewsForm = () => {
 
         <Box>
           <Typography variant="h5" gutterBottom>
-            Тон
+            {t('tone')}
           </Typography>
           <Box display="flex" gap={2} mb={2} flexWrap="wrap">
             {/* {settings.tones?.map((tone) => (
@@ -130,14 +131,14 @@ export const NewsForm = () => {
 
         <Box>
           <Typography variant="h5" gutterBottom>
-            Дополнение к запросу
+            {t('additionalInstructions')}
           </Typography>
           <Box display="flex" gap={2} mb={2} flexWrap="wrap">
             <TextField
               fullWidth
               multiline
               rows={2}
-              label="Дополнение к запросу..."
+              label={t('additionalInstructionsPlaceholder')}
               name="additionalInstructions"
               value={values.additionalInstructions}
               onChange={handleChange}
@@ -148,7 +149,7 @@ export const NewsForm = () => {
         <Box display="flex" flexDirection="column" gap={2}>
           {!showGeneratedResponse ? (
             <Button variant="contained" type="submit" sx={{ mb: 2 }}>
-              Сгенерировать
+              {t('generate')}
             </Button>
           ) : (
             values.selectedModel &&
@@ -163,12 +164,10 @@ export const NewsForm = () => {
                     add: values.additionalInstructions,
                     news_text: values.newsText,
                   })}
-                  apiKey={settings.api_chat_gpt ?? ''}
                 />
                 <GeneratedResponse
                   model={values.selectedModel}
                   prompt={settings.news_header_prompt}
-                  apiKey={settings.api_chat_gpt ?? ''}
                 />
               </>
             )

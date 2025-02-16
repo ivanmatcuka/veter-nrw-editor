@@ -31,7 +31,10 @@ export type SettingsResponse = {
   updated_at: string;
   news_prompt: string;
   news_header_prompt: string;
+  morning_prompt: string;
+  evening_prompt: string;
   weather_morning_prompt: string;
+  weather_evening_prompt: string;
 };
 
 type UpdateSettingsRequest = Omit<

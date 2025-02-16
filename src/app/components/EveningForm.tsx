@@ -1,3 +1,4 @@
+import { Page } from '@/src/components/Page';
 import {
   Box,
   Button,
@@ -5,10 +6,15 @@ import {
   Radio,
   TextField,
   Typography,
-} from "@mui/material";
-import { useFormik } from "formik";
-import { useMemo } from "react";
-import { AI_MODELS } from "../SettingsContext";
+} from '@mui/material';
+import { useFormik } from 'formik';
+import { useTranslations } from 'next-intl';
+import { useCallback, useState } from 'react';
+import stringInject from 'stringinject';
+
+import { Section } from '@/src/components/Section';
+import { AI_MODELS, useSettings } from '../SettingsContext';
+import { MorningPostPreview } from './MorningPostPreview';
 
 type News = {
   text: string;
@@ -17,207 +23,173 @@ type News = {
 }[];
 
 export const EveningForm = () => {
-  const formik = useFormik({
+  const { settings } = useSettings();
+  const [showGeneratedResponse, setShowGeneratedResponse] = useState(false);
+
+  const t = useTranslations();
+
+  const { values, handleChange, setFieldValue, handleSubmit } = useFormik({
     initialValues: {
-      weatherText: "",
-      selectedModel: "",
-      generatedText: "",
-      news: [
-        { text: "", url: "", extra: "" },
-        { text: "", url: "", extra: "" },
-      ] as News,
-      eveningText: {
-        header: "Вечерний бриз! Куда сходить завтра:",
-        before: "",
-        blockHeader: "",
-        after: "Хорошего вам вечера и спокойной ночи! 🌌",
-      },
+      ...settings,
+      weatherText: '',
+      selectedModel: AI_MODELS[0],
+      news: [{}, {}] as News,
     },
-    onSubmit: async (values) => {
-      // Here you would typically handle form submission
-      console.log("Form submitted with values:", values);
-      // Simulating text generation
-      formik.setFieldValue(
-        "generatedText",
-        "Generated text would appear here..."
-      );
-    },
+    onSubmit: () => setShowGeneratedResponse(true),
   });
 
-  const handleAddNewsItem = () => {
-    formik.setFieldValue("news", [
-      ...formik.values.news,
-      { text: "", url: "", extra: "" },
-    ]);
-  };
+  const handleAddNewsItem = useCallback(() => {
+    setFieldValue('news', [...values.news, { text: '', url: '', extra: '' }]);
+  }, [setFieldValue, values.news]);
 
-  const handleRemoveNewsItem = (index: number) => {
-    const newNews = formik.values.news.filter((_, i) => i !== index);
-    formik.setFieldValue("news", newNews);
-  };
+  const handleRemoveNewsItem = useCallback(
+    (index: number) => {
+      const newNews = values.news.filter((_, i) => i !== index);
+      setFieldValue('news', newNews);
+    },
+    [setFieldValue, values.news],
+  );
 
-  const handleUpdateNewsItem = (
-    index: number,
-    field: keyof News[0],
-    value: string
-  ) => {
-    const newNews = [...formik.values.news];
-    newNews[index] = { ...newNews[index], [field]: value };
-    formik.setFieldValue("news", newNews);
-  };
-
-  const generatePrompt = useMemo(
-    () =>
-      formik.values.news
-        .map(
-          (
-            item
-          ) => `You are news writer. Write news article in Russian based on text below. Write only article, no additional text. Article should be 1 paragraph lengh. Add a link ${
-            item.url
-          } to the first verb (not an adverb or other word) of this text. ${
-            item.extra || ""
-          }
-
-Text: ${item.text || ""}`
-        )
-        .join("\n\n"),
-    [formik.values.news]
+  const handleUpdateNewsItem = useCallback(
+    (index: number, field: keyof News[0], value: string) => {
+      const newNews = [...values.news];
+      newNews[index] = { ...newNews[index], [field]: value };
+      setFieldValue('news', newNews);
+    },
+    [setFieldValue, values.news],
   );
 
   return (
-    <Box maxWidth="md" width="100%" margin="auto" p={3}>
-      <form onSubmit={formik.handleSubmit}>
-        <Typography variant="h5" gutterBottom>
-          Погода
-        </Typography>
-        <TextField
-          fullWidth
-          multiline
-          rows={4}
-          label="Текст погоды..."
-          name="weatherText"
-          value={formik.values.weatherText}
-          onChange={formik.handleChange}
-          sx={{ mb: 2 }}
-        />
-
-        <Typography variant="h5" gutterBottom>
-          Новости
-        </Typography>
-        {formik.values.news.map((item, index) => (
-          <Box key={index} sx={{ mb: 2 }}>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              label={`Новость ${index + 1}`}
-              value={item.text}
-              onChange={(e) =>
-                handleUpdateNewsItem(index, "text", e.target.value)
-              }
-              sx={{ mb: 1 }}
-            />
-            <TextField
-              fullWidth
-              label="URL"
-              value={item.url}
-              onChange={(e) =>
-                handleUpdateNewsItem(index, "url", e.target.value)
-              }
-              sx={{ mb: 1 }}
-            />
-            <TextField
-              fullWidth
-              label="Дополнительные инструкции"
-              value={item.extra}
-              onChange={(e) =>
-                handleUpdateNewsItem(index, "extra", e.target.value)
-              }
-              sx={{ mb: 1 }}
-            />
-            <Button onClick={() => handleRemoveNewsItem(index)}>
-              Удалить новость
-            </Button>
-          </Box>
-        ))}
-        <Button onClick={handleAddNewsItem}>Добавить новость</Button>
-
-        <Typography variant="h5" gutterBottom>
-          Вечерний текст
-        </Typography>
-        <TextField
-          fullWidth
-          label="Заголовок"
-          name="eveningText.header"
-          value={formik.values.eveningText.header}
-          onChange={formik.handleChange}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          label="Перед блоком"
-          name="eveningText.before"
-          value={formik.values.eveningText.before}
-          onChange={formik.handleChange}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          label="Заголовок блока"
-          name="eveningText.blockHeader"
-          value={formik.values.eveningText.blockHeader}
-          onChange={formik.handleChange}
-          sx={{ mb: 2 }}
-        />
-        <TextField
-          fullWidth
-          label="После блока"
-          name="eveningText.after"
-          value={formik.values.eveningText.after}
-          onChange={formik.handleChange}
-          sx={{ mb: 2 }}
-        />
-
-        <Typography variant="h5" gutterBottom>
-          Выберите модель
-        </Typography>
-        {AI_MODELS.map((model) => (
-          <FormControlLabel
-            key={model}
-            control={
-              <Radio
-                checked={formik.values.selectedModel === model}
-                onChange={() => formik.setFieldValue("selectedModel", model)}
-              />
-            }
-            label={model}
+    <form onSubmit={handleSubmit}>
+      <Page>
+        <Section>
+          <Typography variant="h5">{t('morningForm.weather')}</Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            label={t('morningForm.weatherTextPlaceholder')}
+            name="weatherText"
+            value={values.weatherText}
+            onChange={handleChange}
           />
-        ))}
+        </Section>
 
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-        >
-          Сгенерировать
-        </Button>
+        <Section>
+          <Typography variant="h5">{t('morningForm.news')}</Typography>
+          {values.news.map((item, index) => (
+            <Box key={index} display="flex" flexDirection="column" gap={1}>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                label={t('morningForm.newsTextPlaceholder')}
+                value={item.text}
+                onChange={(e) =>
+                  handleUpdateNewsItem(index, 'text', e.target.value)
+                }
+              />
+              <TextField
+                fullWidth
+                label={t('morningForm.newsUrlPlaceholder')}
+                value={item.url}
+                onChange={(e) =>
+                  handleUpdateNewsItem(index, 'url', e.target.value)
+                }
+              />
+              <TextField
+                fullWidth
+                label={t('morningForm.additionalInstructionsPlaceholder')}
+                value={item.extra}
+                onChange={(e) =>
+                  handleUpdateNewsItem(index, 'extra', e.target.value)
+                }
+              />
+              <Button
+                onClick={() => handleRemoveNewsItem(index)}
+                variant="outlined"
+                color="error"
+              >
+                {t('morningForm.removeNewsItem')}
+              </Button>
+            </Box>
+          ))}
+          <Button onClick={handleAddNewsItem} variant="outlined">
+            {t('morningForm.addNewsItem')}
+          </Button>
+        </Section>
 
-        {formik.values.generatedText && (
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Сгенерированный текст:
-            </Typography>
-            <TextField
-              fullWidth
-              multiline
-              rows={6}
-              value={formik.values.generatedText}
-              InputProps={{ readOnly: true }}
+        <Section>
+          <Typography variant="h5">Текст для утра</Typography>
+          <TextField
+            fullWidth
+            label="Заголовок"
+            name="evening_text_header"
+            value={values.evening_text_header}
+            onChange={handleChange}
+          />
+          <TextField
+            fullWidth
+            label="Перед блоком"
+            name="evening_text_before"
+            value={values.evening_text_before}
+            onChange={handleChange}
+          />
+          <TextField
+            fullWidth
+            label="Заголовок блока"
+            name="evening_text_block_header"
+            value={values.evening_text_block_header}
+            onChange={handleChange}
+          />
+          <TextField
+            fullWidth
+            label="После блока"
+            name="evening_text_after"
+            value={values.evening_text_after}
+            onChange={handleChange}
+          />
+        </Section>
+
+        <Section>
+          <Typography variant="h5">{t('model')}</Typography>
+          <div>
+            {AI_MODELS.map((model) => (
+              <FormControlLabel
+                key={model}
+                control={
+                  <Radio
+                    checked={values.selectedModel === model}
+                    onChange={() => setFieldValue('selectedModel', model)}
+                  />
+                }
+                label={model}
+              />
+            ))}
+          </div>
+        </Section>
+
+        <Section>
+          {!showGeneratedResponse ? (
+            <Button variant="contained" type="submit">
+              {t('common.generate')}
+            </Button>
+          ) : (
+            <MorningPostPreview
+              textHeader={values.evening_text_header || ''}
+              textBefore={values.evening_text_before || ''}
+              textAfter={values.evening_text_after || ''}
+              textBlockHeader={values.evening_text_block_header || ''}
+              selectedModel={values.selectedModel || ''}
+              weatherPrompt={stringInject(values.weather_evening_prompt || '', {
+                weather: values.weatherText,
+              })}
+              news={values.news || []}
+              newsPrompt={values.evening_prompt || ''}
             />
-          </Box>
-        )}
-      </form>
-    </Box>
+          )}
+        </Section>
+      </Page>
+    </form>
   );
 };

@@ -1,4 +1,7 @@
 {
+  "common": {
+    "generate": "Generate"
+  },
   "settings": {
     "title": "Settings",
     "toneOfVoice": "Tone of voice",
@@ -13,5 +16,41 @@
     "blockHeader": "Block Header",
     "after": "After",
     "submit": "Submit"
+  },
+  "newsForm": {
+    "articleText": "Article Text",
+    "articleTextPlaceholder": "Enter article text...",
+    "articleUrl": "Article URL",
+    "articleUrlPlaceholder": "Enter article URL...",
+    "model": "Model",
+    "paragraphCount": "Paragraph Count",
+    "tone": "Tone",
+    "additionalInstructions": "Additional Instructions",
+    "additionalInstructionsPlaceholder": "Enter additional instructions...",
+    "generate": "Generate"
+  },
+  "morningForm": {
+    "weather": "Weather",
+    "weatherTextPlaceholder": "Enter weather text...",
+    "news": "News",
+    "model": "Model",
+    "newsTextPlaceholder": "Enter news text...",
+    "newsUrlPlaceholder": "Enter news URL...",
+    "removeNewsItem": "Remove news item",
+    "addNewsItem": "Add news item",
+    "additionalInstructionsPlaceholder": "Enter additional instructions...",
+    "generate": "Generate"
+  },
+  "eveningForm": {
+    "weather": "Weather",
+    "weatherTextPlaceholder": "Enter weather text...",
+    "news": "News",
+    "model": "Model",
+    "newsTextPlaceholder": "Enter news text...",
+    "newsUrlPlaceholder": "Enter news URL...",
+    "removeNewsItem": "Remove news item",
+    "addNewsItem": "Add news item",
+    "additionalInstructionsPlaceholder": "Enter additional instructions...",
+    "generate": "Generate"
   }
 }

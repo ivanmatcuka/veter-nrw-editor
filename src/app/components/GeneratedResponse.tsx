@@ -4,17 +4,17 @@ import ReplayIcon from '@mui/icons-material/Replay';
 import { Box, IconButton, TextField } from '@mui/material';
 import { FC, useCallback, useState } from 'react';
 import { getChatGPTResponse, getClaudeResponse } from '../service';
+import { useSettings } from '../SettingsContext';
 
 type GeneratedResponseProps = {
   model: string;
   prompt: string;
-  apiKey: string;
 };
 export const GeneratedResponse: FC<GeneratedResponseProps> = ({
   model,
   prompt,
-  apiKey,
 }) => {
+  const { settings } = useSettings();
   const [isLoading, setIsLoading] = useState(false);
   const [generatedText, setGeneratedText] = useState('');
   const [error, setError] = useState('');
@@ -26,13 +26,24 @@ export const GeneratedResponse: FC<GeneratedResponseProps> = ({
     let res;
     let err;
 
+    if (!settings?.api_chat_gpt || !settings?.api_claude) {
+      setError('API keys are not set');
+      setIsLoading(false);
+      return;
+    }
+
     if (model === 'Claude') {
-      const { data, error } = await getClaudeResponse(apiKey, prompt);
+      const { data, error } = await getClaudeResponse(
+        settings.api_claude,
+        prompt,
+      );
       res = data;
       err = error;
     } else {
-      const { data, error } = await getChatGPTResponse(apiKey, prompt, (res) =>
-        setGeneratedText(res.text),
+      const { data, error } = await getChatGPTResponse(
+        settings.api_chat_gpt,
+        prompt,
+        (res) => setGeneratedText(res.text),
       );
       res = data;
       err = error;
@@ -42,7 +53,7 @@ export const GeneratedResponse: FC<GeneratedResponseProps> = ({
     if (res) setGeneratedText(res);
 
     setIsLoading(false);
-  }, [apiKey, prompt, model]);
+  }, [prompt, model, settings.api_chat_gpt, settings.api_claude]);
 
   return (
     <Box display="flex" gap={2} component="form" alignItems="flex-start">
